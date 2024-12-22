@@ -1,0 +1,37 @@
+{
+  "name": "@superhero/eventflow-certificates",
+  "version": "4.0.0",
+  "description": "Eventflow certificates is common tls certificates logic used in the eventflow ecosystem.",
+  "keywords": [
+    "eventflow"
+  ],
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
+  "dependencies": {
+    "@superhero/eventflow-db": "^4.1.0",
+    "@superhero/log": "^4.0.0",
+    "@superhero/openssl": "^4.0.2",
+    "@superhero/deep": "^4.1.0"
+  },
+  "devDependencies": {
+    "@superhero/config": "^4.1.2",
+    "@superhero/locator": "^4.2.0"
+  },
+  "scripts": {
+    "test-build": "npm explore @superhero/eventflow-db -- npm run test-build",
+    "test-only": "node --test-only --trace-warnings --test --experimental-test-coverage",
+    "test": "node --test --experimental-test-coverage"
+  },
+  "author": {
+    "name": "Erik Landvall",
+    "email": "erik@landvall.se"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superhero/eventflow-certificates.git"
+  }
+}
