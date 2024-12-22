@@ -1,4 +1,4 @@
-# @superhero/eventflow-certificates
+# Eventflow Certificates
 
 **Version:** 4.0.0
 
