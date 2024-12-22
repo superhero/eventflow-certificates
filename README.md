@@ -4,15 +4,11 @@
 
 Eventflow Certificates is a TLS certificates management library designed for use within the Eventflow ecosystem. It handles the creation, management, and lifecycle of root, intermediate, and leaf certificates with encryption and secure storage capabilities.
 
----
-
 ## Installation
 
 ```bash
 npm install @superhero/eventflow-certificates
 ```
-
----
 
 ## Features
 
@@ -23,16 +19,12 @@ npm install @superhero/eventflow-certificates
 - Lazy-loading with caching to minimize resource usage
 - Easy integration with Eventflow's database layer
 
----
-
 ## Dependencies
 
 - [@superhero/eventflow-db](https://npmjs.com/package/@superhero/eventflow-db)
 - [@superhero/log](https://npmjs.com/package/@superhero/log)
 - [@superhero/openssl](https://npmjs.com/package/@superhero/openssl)
 - [@superhero/deep](https://npmjs.com/package/@superhero/deep)
-
----
 
 ## Usage
 
@@ -68,8 +60,6 @@ const intermediateCert  = await certificates.intermediate;
 const leafCert          = await certificates.leaf;
 ```
 
----
-
 ## Configuration
 
 The `Certificates` class accepts a configuration object with the following properties:
@@ -82,8 +72,6 @@ The `Certificates` class accepts a configuration object with the following prope
 | `CERT_LEAF_DAYS`          | `number` | Validity period of the leaf certificate in days.                            |
 | `CERT_ALGORITHM`          | `string` | Algorithm used for certificate generation (e.g., `rsa`, `ecdsa`).           |
 | `CERT_HASH`               | `string` | Hash function for certificate signing (e.g., `sha256`, `sha512`).           |
-
----
 
 ## Methods
 
@@ -156,8 +144,6 @@ Retrieves the leaf certificate.
 ```javascript
 const leafCertificate = await certificates.leaf;
 ```
-
----
 
 ## Testing
 
