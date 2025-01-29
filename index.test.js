@@ -1,4 +1,3 @@
-import Config               from '@superhero/config'
 import Locator              from '@superhero/locator'
 import Certificates         from '@superhero/eventflow-certificates'
 import assert               from 'node:assert/strict'
@@ -8,11 +7,10 @@ import { suite, test, before, after } from 'node:test'
 suite('@superhero/eventflow-certificates', async () =>
 {
   const 
-    config  = new Config(),
-    locator = new Locator()
+    locator = new Locator(),
+    config  = locator.config
 
   await config.add('@superhero/eventflow-db')
-  locator.set('@superhero/config', config)
   const db = await locator.lazyload('@superhero/eventflow-db')
 
   let conf, manager, icaUID = 'INTERMEDIATE-CERT-ID', leafUID = 'LEAF-CERT-ID'
