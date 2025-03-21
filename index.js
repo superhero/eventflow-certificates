@@ -208,7 +208,7 @@ export default class Certificates
   {
     return this.openSSL.root(
     {
-      days      : this.config.CERT_ROOT_DAYS,
+      days      : Number(this.config.CERT_ROOT_DAYS),
       algorithm : this.config.CERT_ALGORITHM,
       hash      : this.config.CERT_HASH,
       subject   : { UID },
@@ -221,7 +221,7 @@ export default class Certificates
     const root = await this.root
     return await this.openSSL.intermediate(root, 
     {
-      days      : this.config.CERT_INTERMEDIATE_DAYS,
+      days      : Number(this.config.CERT_INTERMEDIATE_DAYS),
       algorithm : this.config.CERT_ALGORITHM,
       hash      : this.config.CERT_HASH,
       dns       : [ '.' + UID ],
@@ -239,7 +239,7 @@ export default class Certificates
     const ica = await this.intermediate
     return await this.openSSL.leaf(ica,
     {
-      days      : this.config.CERT_LEAF_DAYS,
+      days      : Number(this.config.CERT_LEAF_DAYS),
       algorithm : this.config.CERT_ALGORITHM,
       hash      : this.config.CERT_HASH,
       dns       : [ this.leafUID ],
@@ -257,8 +257,8 @@ export default class Certificates
     const
       cipher      = this.config.CERT_PASS_CIPHER,
       hash        = this.config.CERT_PASS_PBKDF2_HASH,
-      bytes       = this.config.CERT_PASS_PBKDF2_BYTES,
-      iterations  = this.config.CERT_PASS_PBKDF2_ITERATIONS,
+      bytes       = Number(this.config.CERT_PASS_PBKDF2_BYTES),
+      iterations  = Number(this.config.CERT_PASS_PBKDF2_ITERATIONS),
       salt        = crypto.randomBytes(16),
       iv          = crypto.randomBytes(16),
       key         = crypto.pbkdf2Sync(password, salt, iterations, bytes, hash), // derive key
@@ -274,8 +274,8 @@ export default class Certificates
     const
       cipher      = this.config.CERT_PASS_CIPHER,
       hash        = this.config.CERT_PASS_PBKDF2_HASH,
-      bytes       = this.config.CERT_PASS_PBKDF2_BYTES,
-      iterations  = this.config.CERT_PASS_PBKDF2_ITERATIONS,
+      bytes       = Number(this.config.CERT_PASS_PBKDF2_BYTES),
+      iterations  = Number(this.config.CERT_PASS_PBKDF2_ITERATIONS),
       key         = crypto.pbkdf2Sync(password, salt, iterations, bytes, hash),
       decipher    = crypto.createDecipheriv(cipher, key, iv)
 
