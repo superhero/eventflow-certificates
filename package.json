@@ -1,6 +1,6 @@
 {
   "name": "@superhero/eventflow-certificates",
-  "version": "4.3.8",
+  "version": "4.3.9",
   "description": "Eventflow certificates is common tls certificates logic used in the eventflow ecosystem.",
   "keywords": [
     "eventflow"
@@ -16,8 +16,8 @@
     "@superhero/deep": "^4.2.0"
   },
   "devDependencies": {
-    "@superhero/eventflow-db": "^4.3.8",
-    "@superhero/locator": "^4.2.5"
+    "@superhero/eventflow-db": "^4.3.9",
+    "@superhero/locator": "^4.3.0"
   },
   "scripts": {
     "test-build": "npm explore @superhero/eventflow-db -- npm run test-build",
