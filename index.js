@@ -224,7 +224,7 @@ export default class Certificates
       days      : Number(this.config.CERT_INTERMEDIATE_DAYS),
       algorithm : this.config.CERT_ALGORITHM,
       hash      : this.config.CERT_HASH,
-      dns       : [ '.' + UID ],
+      dns       : [ '.' + UID.toLowerCase() ],
       subject   : { UID },
       password  :
       {
@@ -242,7 +242,7 @@ export default class Certificates
       days      : Number(this.config.CERT_LEAF_DAYS),
       algorithm : this.config.CERT_ALGORITHM,
       hash      : this.config.CERT_HASH,
-      dns       : [ this.leafUID ],
+      dns       : [ this.leafUID.toLowerCase() ],
       subject   : { UID },
       password  :
       {
