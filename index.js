@@ -29,7 +29,7 @@ export default class Certificates
     this.intermediateUID  = intermediateUID.toUpperCase()
     this.leafUID          = leafUID.toUpperCase()
     this.#db              = db
-    this.log              = new Log({ label: `[EVENTFLOW:CERTIFICATES:${leafUID}]` })
+    this.log              = new Log(Object.assign({ label: `[EVENTFLOW:CERTIFICATES:${leafUID}]` }, config.log))
 
     deepassign(this.config, config)
 
