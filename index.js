@@ -26,8 +26,8 @@ export default class Certificates
 
   constructor(intermediateUID, leafUID, config, db)
   {
-    this.intermediateUID  = intermediateUID
-    this.leafUID          = leafUID
+    this.intermediateUID  = intermediateUID.toUpperCase()
+    this.leafUID          = leafUID.toUpperCase()
     this.#db              = db
     this.log              = new Log({ label: `[EVENTFLOW:CERTIFICATES:${leafUID}]` })
 
