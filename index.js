@@ -9,7 +9,6 @@ import deepassign from '@superhero/deep/assign'
 export default class Certificates
 {
   #db
-  log     = new Log({ label: '[EVENTFLOW:CERTIFICATES]' })
   #map    = new Map()
   openSSL = new OpenSSL()
   config  =
@@ -30,6 +29,7 @@ export default class Certificates
     this.intermediateUID  = intermediateUID
     this.leafUID          = leafUID
     this.#db              = db
+    this.log              = new Log({ label: `[EVENTFLOW:CERTIFICATES:${leafUID}]` })
 
     deepassign(this.config, config)
 
