@@ -2,7 +2,7 @@ import crypto     from 'node:crypto'
 import Log        from '@superhero/log'
 import OpenSSL    from '@superhero/openssl'
 import deepassign from '@superhero/deep/assign'
-import config     from '@superhero/superhero/eventflow-certificates/config'
+import config     from '@superhero/eventflow-certificates/config'
 
 /**
  * @memberof Eventflow
