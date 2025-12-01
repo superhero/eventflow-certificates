@@ -12,7 +12,7 @@ export default class Certificates
   #db
   #map    = new Map()
   openSSL = new OpenSSL()
-  config  = structuredClone(config)
+  config  = structuredClone(config.eventflow.certificates)
 
   constructor(intermediateUID, leafUID, config, db)
   {
