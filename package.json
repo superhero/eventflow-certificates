@@ -1,6 +1,6 @@
 {
   "name": "@superhero/eventflow-certificates",
-  "version": "4.7.20",
+  "version": "4.7.21",
   "description": "Eventflow certificates is common tls certificates logic used in the eventflow ecosystem.",
   "keywords": [
     "eventflow"
@@ -18,15 +18,15 @@
     "test": "syntax-check; node --test --test-reporter=@superhero/audit/reporter --experimental-test-coverage"
   },
   "dependencies": {
-    "@superhero/log": "4.7.20",
-    "@superhero/openssl": "4.7.20",
-    "@superhero/deep": "4.7.20"
+    "@superhero/log": "4.7.21",
+    "@superhero/openssl": "4.7.21",
+    "@superhero/deep": "4.7.21"
   },
   "devDependencies": {
-    "@superhero/audit": "4.7.20",
+    "@superhero/audit": "4.7.21",
     "@superhero/syntax-check": "0.0.2",
-    "@superhero/eventflow-db": "4.7.20",
-    "@superhero/locator": "4.7.20"
+    "@superhero/eventflow-db": "4.7.21",
+    "@superhero/locator": "4.7.21"
   },
   "author": {
     "name": "Erik Landvall",
