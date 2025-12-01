@@ -8,7 +8,8 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./index.js"
+    ".": "./index.js",
+    "./config": "./config.js"
   },
   "scripts": {
     "syntax-check": "syntax-check",
