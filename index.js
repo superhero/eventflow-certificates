@@ -2,6 +2,7 @@ import crypto     from 'node:crypto'
 import Log        from '@superhero/log'
 import OpenSSL    from '@superhero/openssl'
 import deepassign from '@superhero/deep/assign'
+import config     from '@superhero/config'
 
 /**
  * @memberof Eventflow
@@ -11,18 +12,7 @@ export default class Certificates
   #db
   #map    = new Map()
   openSSL = new OpenSSL()
-  config  =
-  {
-    CERT_ALGORITHM              : OpenSSL.ALGO.EdDSAEd448,
-    CERT_HASH                   : OpenSSL.HASH.SHA512,
-    CERT_ROOT_DAYS              : 365,
-    CERT_INTERMEDIATE_DAYS      : 30,
-    CERT_LEAF_DAYS              : 7,
-    CERT_PASS_CIPHER            : 'aes-256-gcm',
-    CERT_PASS_PBKDF2_HASH       : 'sha512',
-    CERT_PASS_PBKDF2_BYTES      : 32,
-    CERT_PASS_PBKDF2_ITERATIONS : 1e6
-  }
+  config  = structuredClone(config)
 
   constructor(intermediateUID, leafUID, config, db)
   {
