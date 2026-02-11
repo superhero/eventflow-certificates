@@ -10,9 +10,11 @@ import config     from '@superhero/eventflow-certificates/config'
 export default class Certificates
 {
   #db
-  #map    = new Map()
-  openSSL = new OpenSSL()
-  config  = structuredClone(config.eventflow.certificates)
+  #map      = new Map()
+  openSSL   = new OpenSSL()
+  config    = structuredClone(config.eventflow.certificates)
+  #lockRef  = 'eventflow:certificates'
+  rootUID   = 'EVENTFLOW-ROOT-CA'
 
   constructor(intermediateUID, leafUID, config, db)
   {
@@ -48,7 +50,7 @@ export default class Certificates
    * 
    * @returns {Promise<boolean>} true if the certificate was persisted, false if it already exists
    */
-  perist(id, validity, cert, key, pass)
+  #perist(id, validity, cert, key, pass)
   {
     const
       encryptionKey = this.config.CERT_PASS_ENCRYPTION_KEY,
@@ -74,29 +76,85 @@ export default class Certificates
   }
 
   /**
-   * Revoke a specific certificate by ID in the database.
-   * @param {string} id the certificate identifier
-   * @returns {Promise<boolean>} true if the certificate was revoked, false if it does not exist
+   * Revokes the certificate, and any certificate that depends on it.
+   * @param {string} id the certificate identifier (UID), must be one of: `this.rootUID`, `this.intermediateUID` or `this.leafUID`
+   * @returns {Promise<boolean>} true if any certificate was revoked, false if none was revoked.
    */
-  revoke(id)
+  async revoke(id)
   {
-    return this.#db.revokeCertificate(id)
+    return await this.#db.lock(this.#lockRef, this.#revoke.bind(this, id))
+  }
+
+  async #revoke(id)
+  {
+    let revoked = false
+
+    switch(id)
+    {
+      case this.rootUID: 
+      {
+        this.#map.delete(this.rootUID)
+        revoked = await this.#db.revokeCertificate(this.rootUID)
+
+        // fall through to also revoke the intermediate and leaf certificates, since they depends on the root certificate
+      }
+      case this.intermediateUID: 
+      {
+        this.#map.delete(this.intermediateUID)
+        revoked = await this.#db.revokeCertificate(this.intermediateUID) || revoked
+
+        // fall through to also revoke the leaf certificate, since it depends on the intermediate certificate
+      }
+      case this.leafUID:
+      {
+        this.#map.delete(this.leafUID)
+        revoked = await this.#db.revokeCertificate(this.leafUID) || revoked
+
+        // returns if any of the certificates was revoked...
+        return revoked
+      }
+      default:
+      {
+        const error = new Error(`can not revoke the provided invalid certificate (${id})`)
+        error.code  = 'E_EVENTFLOW_CERTIFICATES_INVALID_ID'
+        throw error
+      }
+    }
+  }
+
+  /**
+   * Get the certificate chain, which includes the root, intermediate and leaf certificates.
+   * @returns {Promise
+   * <{
+   *  root          : {cert:string, key:string, pass:string}, 
+   *  intermediate  : {cert:string, key:string, pass:string}, 
+   *  leaf          : {cert:string, key:string, pass:string}
+   * }>}
+   */
+  async getChain()
+  {
+    return await this.#db.lock(this.#lockRef, async () => 
+    ({
+      root         : await this.#getRoot(),
+      intermediate : await this.#getIntermediate(),
+      leaf         : await this.#getLeaf()
+    }))
   }
 
   /**
    * The root certificate authority (CA).
    * @returns {Promise<{cert:string, key:string, pass:string}>}
    */
-  get root()
+  async #getRoot()
   {
-    return this.#lazyload('EVENTFLOW-ROOT-CA', this.#createRoot.bind(this))
+    return this.#lazyload(this.rootUID, this.#createRoot.bind(this))
   }
 
   /**
    * The intermediate certificate authority (ICA).
    * @returns {Promise<{cert:string, key:string, pass:string}>}
    */
-  get intermediate()
+  async #getIntermediate()
   {
     return this.#lazyload(this.intermediateUID, this.#createIntermediate.bind(this))
   }
@@ -105,7 +163,7 @@ export default class Certificates
    * The leaf end-entity certificate.
    * @returns {Promise<{cert:string, key:string, pass:string}>}
    */
-  get leaf()
+  async #getLeaf()
   {
     return this.#lazyload(this.leafUID, this.#createLeaf.bind(this))
   }
@@ -142,8 +200,7 @@ export default class Certificates
     if(Date.now() + 6e5 > crt.validity)
     {
       this.log.warn`certificate expired ${id}`
-      this.#map.delete(id)
-      await this.#db.revokeCertificate(id)
+      await this.#revoke(id)
       return this.#lazyload(id, factory)
     }
     else
@@ -176,7 +233,7 @@ export default class Certificates
     const
       x509          = new crypto.X509Certificate(certificate.cert),
       validity      = x509.validToDate,
-      isPersisted   = await this.perist(id, validity, cert, key, keyPass)
+      isPersisted   = await this.#perist(id, validity, cert, key, keyPass)
 
     // If multiple replicas tries at the same time to creater the certificate, 
     // then only the first one to persist is valid, the rest should throw away 
@@ -208,7 +265,7 @@ export default class Certificates
 
   async #createIntermediate(UID, password)
   {
-    const root = await this.root
+    const root = await this.#getRoot()
     return await this.openSSL.intermediate(root, 
     {
       days      : Number(this.config.CERT_INTERMEDIATE_DAYS),
@@ -226,7 +283,7 @@ export default class Certificates
 
   async #createLeaf(UID, password)
   {
-    const ica = await this.intermediate
+    const ica = await this.#getIntermediate()
     return await this.openSSL.leaf(ica,
     {
       days      : Number(this.config.CERT_LEAF_DAYS),

@@ -1,4 +1,5 @@
 import Locator              from '@superhero/locator'
+import config               from '@superhero/eventflow-db/config'
 import Certificates         from '@superhero/eventflow-certificates'
 import assert               from 'node:assert/strict'
 import { X509Certificate }  from 'node:crypto'
@@ -6,12 +7,13 @@ import { suite, test, before, after } from 'node:test'
 
 suite('@superhero/eventflow-certificates', async () =>
 {
-  const 
-    locator = new Locator(),
-    config  = locator.config
+  const locator = new Locator()
 
-  await config.add('@superhero/eventflow-db')
+  await locator.config.assign(config, '@superhero/eventflow-db')
+
   const db = await locator.lazyload('@superhero/eventflow-db')
+
+  await db.createTableCertificate()
 
   let conf, manager, icaUID = 'INTERMEDIATE-CERT-ID', leafUID = 'LEAF-CERT-ID'
 
@@ -43,7 +45,7 @@ suite('@superhero/eventflow-certificates', async () =>
 
   test('Get root certificate', async (sub) =>
   {
-    const root = await manager.root
+    const { root } = await manager.getChain()
 
     assert.ok(root.validity > Date.now())
     assert.ok(root.cert)
@@ -55,13 +57,13 @@ suite('@superhero/eventflow-certificates', async () =>
 
     await sub.test('Get same root certificate each time lazyloading it', async () =>
     {
-      const root2 = await manager.root
+      const { root: root2 } = await manager.getChain()
       assert.deepEqual(root, root2)
     })
 
     await sub.test('Get intermediate certificate', async (sub) =>
     {
-      const ica = await manager.intermediate
+      const { intermediate: ica } = await manager.getChain()
   
       assert.ok(ica.validity > Date.now())
       assert.ok(ica.cert)
@@ -73,7 +75,7 @@ suite('@superhero/eventflow-certificates', async () =>
 
       await sub.test('Get leaf certificate', async (sub) =>
       {
-        const leaf = await manager.leaf
+        const { leaf } = await manager.getChain()
     
         assert.ok(leaf.validity > Date.now())
         assert.ok(leaf.cert)
@@ -87,10 +89,7 @@ suite('@superhero/eventflow-certificates', async () =>
         {
           manager.clearCache()
 
-          const
-            root2 = await manager.root,
-            ica2  = await manager.intermediate,
-            leaf2 = await manager.leaf
+          const{ root: root2, intermediate: ica2, leaf: leaf2 } = await manager.getChain()
 
           assert.deepEqual(root, root2)
           assert.deepEqual(ica, ica2)
@@ -102,7 +101,7 @@ suite('@superhero/eventflow-certificates', async () =>
           await assert.doesNotReject(manager.revoke(leafUID))
 
           const
-            leaf      = await manager.leaf,
+            { leaf }  = await manager.getChain(),
             leafX509  = new X509Certificate(leaf.cert)
 
           assert.ok(leafX509.checkIssued(icaX509))
